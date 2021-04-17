@@ -18,12 +18,21 @@
     <ClCompile Include="n5.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pc_model.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="sequence.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Filter.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

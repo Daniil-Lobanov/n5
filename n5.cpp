@@ -7,14 +7,8 @@
 видеокарты, стоимостью компьютера и кол-вом экземпляров. Поиск по типу процессора,
 объему ОЗУ, памяти видеокарты и объему жесткого диска.*/ //Либо по одному либо по двум либо по трем
 
-
-#include "pc_model.h"
 #include "sequence.h"
 #include <iostream>
-
-using std::cout;
-using std::cin;
-
 
 int input_int()
 {
@@ -33,7 +27,6 @@ int input_int()
     }
 }
 
-
 int bounded_input(int low, int high)
 {
     for (;;)
@@ -48,21 +41,33 @@ int bounded_input(int low, int high)
     }
 }
 
-//pc_model make_object_to_find(string processor_type = "", int ram_capacity = 0, int hard_drive_capacity = 0,
-//    int video_memory_capacity = 0)
-//{
-//    pc_model object_to_find;
-//    object_to_find.set_processor(processor_type);
-//    object_to_find.set_ram(ram_capacity);
-//    object_to_find.set_hard_drive(hard_drive_capacity);
-//    object_to_find.set_video(video_memory_capacity);
-//
-//    return object_to_find;
-//}
-
-std::vector<filter> get_filters(pc_model& object_to_find)
+pc_model get_model()
 {
-    std::vector<filter> filters;
+    pc_model model;
+    cout << "Введите код" << endl;
+    model.code = input_int();
+    cout << "Введите марку компьютера" << endl;
+    cin >> model.brand;
+    cout << "Введите тип процессора" << endl;
+    cin >> model.processor_type;
+    cout << "Введите частоту работы процессора" << endl;
+    model.processor_freq = input_int();
+    cout << "Введите объем оперативной памяти" << endl;
+    model.ram_capacity = input_int();
+    cout << "Введите объем жесткого диска" << endl;
+    model.hard_drive_capacity = input_int();
+    cout << "Введите объем памяти видеокарты" << endl;
+    model.video_memory_capacity = input_int();
+    cout << "Введите стоимость в тыс" << endl;
+    model.cost = input_int();
+    cout << "Введите кол-во экземпляров в тыс" << endl;
+    model.count = input_int();
+    return model;
+}
+
+filter get_filter()
+{
+    filter search_filter;
     string type;
     int capacity;
 
@@ -71,41 +76,81 @@ std::vector<filter> get_filters(pc_model& object_to_find)
     answer = input_int();
     if (answer == 1)
     {
-        filters.push_back(pc_model::comp_type);
         cout << "Введите тип процессора" << endl;
         cin >> type;
-        object_to_find.set_processor(type);
+        search_filter.processor_type = type;
     }
 
     cout << "Добавить фильтр по объему ОЗУ? 1 - да" << endl;
     answer = input_int();
     if (answer == 1)
     {
-        filters.push_back(pc_model::comp_ram);
         cout << "Введите объем ОЗУ" << endl;
         capacity = input_int();
-        object_to_find.set_ram(capacity);
+        search_filter.ram_capacity = capacity;
     }
     cout << "Добавить фильтр по объему памяти видеокарты? 1 - да" << endl;
     answer = input_int();
     if (answer == 1)
     {
-        filters.push_back(pc_model::comp_video);
-        cout << "Введите объем ОЗУ" << endl;
+        cout << "Введите объем памяти видеокарты" << endl;
         capacity = input_int();
-        object_to_find.set_video(capacity);
+        search_filter.video_memory_capacity = capacity;
     }
     cout << "Добавить фильтр по объему жесткого диска? 1 - да" << endl;
     answer = input_int();
     if (answer == 1)
     {
-        filters.push_back(pc_model::comp_hard_drive);
-        cout << "Введите объем ОЗУ" << endl;
+        cout << "Введите объем жесткого диска" << endl;
         capacity = input_int();
-        object_to_find.set_hard_drive(capacity);
+        search_filter.hard_drive_capacity = capacity;
     }
-    
-    return filters;
+
+    return search_filter;
+}
+
+istream& operator>> (istream& in, pc_model& op)
+{
+    in >> op.code;
+    in >> op.brand;
+    in >> op.processor_type;
+    in >> op.processor_freq;
+    in >> op.ram_capacity;
+    in >> op.hard_drive_capacity;
+    in >> op.video_memory_capacity;
+    in >> op.cost;
+    in >> op.count;
+    return in;
+}
+
+ostream& operator<< (ostream& out, const pc_model& op)
+{
+    out << op.code << endl << op.brand << endl << op.processor_type << endl << op.processor_freq << endl << op.ram_capacity << endl
+        << op.hard_drive_capacity << endl << op.video_memory_capacity << endl
+        << op.cost << endl << op.count << endl;
+    return out;
+}
+
+void print_selection(vector<pc_model> seq)
+{
+    cout << "Вывод результата: " << endl;
+    cout << "1 - в файл" << endl;
+    cout << "2 - на экран" << endl;
+
+    string file_name;
+    int answer = bounded_input(1, 2);
+
+    switch (answer)
+    {
+    case 1:
+        cout << "Введите имя файла" << endl;
+        cin >> file_name;
+        sequence<pc_model>::print_file(seq, file_name);
+        break;
+    case 2:
+        sequence<pc_model>::print_console(seq);
+        break;
+    }
 }
 
 void show_find_menu()
@@ -113,79 +158,77 @@ void show_find_menu()
     cout << "ПОИСК:" << endl;
     cout << "   1 - линейный" << endl;
     cout << "   2 - двоичный" << endl;
-    cout << "   3 - выборка всех вариантов:" << endl;
+    cout << "   3 - выборка всех вариантов" << endl;
+    cout << "   4 - назад" << endl;
 }
 
 void find_menu(sequence<pc_model>& seq)
 {
     show_find_menu();
-        
-    /*string processor_type;
-    int ram_capacity, hard_drive_capacity, video_memory_capacity;
-    std::vector<pc_model> temp;*/
 
-
-    int answer = bounded_input(1, 3);
+    int answer = bounded_input(1, 4);
     pc_model object_to_find;
-    std::vector<filter> filters = get_filters(object_to_find);
+    filter search_filter = get_filter();
+    vector<pc_model> res;
+    try
+    {
+        switch (answer)
+        {
+        case 1:
+            cout << seq.find_linear(search_filter) << endl;
+            break;
+        case 2:
+            cout << seq.find_binary(search_filter) << endl;
+            break;
+        case 3:
+            res = seq.find_all(search_filter);
+            print_selection(res);
+            break;
+        case 4:
+            return;
+            break;
+        }
+    }
+    catch (runtime_error err)
+    {
+       cout << err.what() << endl;
+    }
+}
+
+void show_change_menu()
+{
+    cout << "РАБОТА С КОНТЕЙНЕРОМ:" << endl;
+    cout << "   1 - добавить элемент" << endl;
+    cout << "   2 - изменить элемент" << endl;
+    cout << "   3 - удалить элемент" << endl;
+    cout << "   4 - назад" << endl;
+}
+
+void change_menu(sequence<pc_model>& seq)
+{
+    show_change_menu();
+    int answer = bounded_input(1, 4);
+    pc_model new_model;
+    filter search_filter;
 
     switch (answer)
     {
     case 1:
-        /*cout << "Введите тип процессора" << endl;
-        cin >> processor_type;
-        cout << "Введите объем ОЗУ" << endl;
-        ram_capacity = input_int();
-        cout << "Введите объем памяти видеокарты" << endl;
-        video_memory_capacity = input_int();
-        cout << "Введите объем жесткого диска" << endl;
-        hard_drive_capacity = input_int();
-
-        object_to_find = make_object_to_find(processor_type, ram_capacity, hard_drive_capacity,
-            video_memory_capacity);
-        seq.find_linear(object_to_find, pc_model::comp_all);*/
-        /*cout << */seq.find_linear(object_to_find, filters);
+        new_model = get_model();
+        seq.add(new_model);
         break;
     case 2:
-        /*cout << "Введите тип процессора" << endl;
-        cin >> processor_type;
-        cout << "Введите объем ОЗУ" << endl;
-        ram_capacity = input_int();
-        cout << "Введите объем памяти видеокарты" << endl;
-        video_memory_capacity = input_int();
-        cout << "Введите объем жесткого диска" << endl;
-        hard_drive_capacity = input_int();
-
-        object_to_find = make_object_to_find(processor_type, ram_capacity, hard_drive_capacity,
-            video_memory_capacity);
-        seq.find_binary(object_to_find, pc_model::comp_all, pc_model::comp_all_less);*/
-
+        search_filter = get_filter();
+        new_model = get_model();
+        seq.change(search_filter, new_model);
         break;
     case 3:
-        /*cout << "Введите тип процессора" << endl;
-        cin >> processor_type;
-        object_to_find = make_object_to_find(processor_type);
-        temp = seq.find_all(object_to_find, pc_model::comp_type);*/
-
+        search_filter = get_filter();
+        seq.delete_elem(search_filter);
         break;
-    /*case 4:
-        /*cout << "Введите объем ОЗУ" << endl;
-        ram_capacity = input_int();
-        object_to_find.set_ram(ram_capacity);
-        temp = seq.find_all(object_to_find, pc_model::comp_ram);
+    case 4:
+        return;
         break;
-    case 5:
-        /*cout << "Введите объем памяти видеокарты" << endl;
-        video_memory_capacity = input_int();
-        object_to_find.set_ram(video_memory_capacity);
-        temp = seq.find_all(object_to_find, pc_model::comp_video);
-        break;
-    case 6:
-        /*cout << "Введите объем жесткого диска" << endl;
-        hard_drive_capacity = input_int();
-        object_to_find.set_ram(hard_drive_capacity);
-        temp = seq.find_all(object_to_find, pc_model::comp_hard_drive);
-        break;*/
     }
 }
 
@@ -193,10 +236,11 @@ void show_menu()
 {
     cout << "Меню" << endl;
     cout << "1 - поиск" << endl;
+    cout << "2 - работа с контейнером" << endl;
     cout << "Вывод результата: " << endl;
-    cout << "2 - в файл" << endl;
-    cout << "3 - на экран" << endl << endl;
-    cout << "4 - выход" << endl;
+    cout << "3 - в файл" << endl;
+    cout << "4 - на экран" << endl << endl;
+    cout << "5 - выход" << endl;
 }
 
 bool seq_menu(sequence<pc_model>& seq)
@@ -204,40 +248,29 @@ bool seq_menu(sequence<pc_model>& seq)
     show_menu();
 
     string file_name;
-    int answer = bounded_input(1, 4);
+    int answer = bounded_input(1, 5);
 
     switch (answer)
     {
     case 1:
-        find_menu(seq);         //СДЕЛАТЬ ЧТО-ТО С ПОВТОРЯЮЩИМИСЯ КУСКАМИ КОДА!!!
-                                //УНИВЕРСАЛЬНУЮ ПРОЦЕДУРУ ДЛЯ СОЗДАНИЯ ОБЪЕКТА КЛАССА С ЗАДАННЫМ ПАРАМЕТОМ
-                                //ДЛЯ МУЛЬТИПОИСКА МОЖНО РЕАЛИЗОВАТЬ СПИСОК ИЗ КОМПАРАТОРОВ!!!!
+        find_menu(seq);
         break;
     case 2:
+        change_menu(seq);
+        break;
+    case 3:
         cout << "Введите имя файла" << endl;
         cin >> file_name;
         seq.print_file(file_name);
         break;
-    case 3:
-        //seq.print_console();
-        break;
     case 4:
+        seq.print_console();
+        break;
+    case 5:
         return false;
         break;
     }
     return true;
-}
-
-sequence<pc_model> generate_n(int n)
-{
-    sequence<pc_model> seq;//СДЕЛАТЬ ПРОВЕРКУ НА ПЕРЕПОЛНЕНИЕ
-    for (int i = 0; i < n; i++)
-    {
-        pc_model elem;
-        cin >> elem;
-        seq.add(elem);
-    }
-    return seq;
 }
 
 void menu()
@@ -250,24 +283,29 @@ void menu()
     string file_name;
     int n;
 
-    switch (answer)
+    try
     {
-    case 1:
-        cout << "Введите колличество элементов в контейнере - ";
-        n = input_int();
-        seq = generate_n(n);
-        break;
-    case 2:
-        cout << "Введите имя файла" << endl;
-        cin >> file_name;
-        seq.init_from_file(file_name);
-        break;
+        switch (answer)
+        {
+        case 1:
+            cout << "Введите колличество элементов в контейнере - ";
+            n = input_int();
+            seq.generate_n(n);
+            break;
+        case 2:
+            cout << "Введите имя файла" << endl;
+            cin >> file_name;
+            seq.init_from_file(file_name);
+            break;
+        }
+
+        for (; seq_menu(seq););
     }
-
-    for (; seq_menu(seq););
+    catch (runtime_error err)
+    {
+        cout << err.what() << endl;
+    }
 }
-
-
 
 int main()
 {
